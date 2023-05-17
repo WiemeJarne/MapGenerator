@@ -50,8 +50,11 @@ public:
 			while (m_Continue && !m_SoundQueue.empty())
 			{
 				auto& sound{ m_SoundQueue.front() };
-				Play(sound.first, sound.second);
 				m_SoundQueue.pop();
+
+				lock.unlock();
+
+				Play(sound.first, sound.second);
 			}
 		}
 	}
