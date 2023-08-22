@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include <iostream>
 
 dae::Camera::Camera(float zoom, int startXPos, int startYPos, bool)
 	: m_Zoom{ zoom }
