@@ -83,7 +83,6 @@ dae::Engine::Engine(const std::string &dataPath)
 	}
 
 	SceneManager::GetInstance().SetScenesSize(static_cast<float>(windowWidth), static_cast<float>(windowHeight));
-
 	g_window = SDL_CreateWindow(
 		"Programming 4 assignment",
 		SDL_WINDOWPOS_CENTERED,
