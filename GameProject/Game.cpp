@@ -12,6 +12,7 @@
 #include "SceneManager.h"
 #include "SoundServiceLocator.h"
 #include "SDLSoundSystem.h"
+#include "PerlinNoise2D.h"
 
 void load()
 {
