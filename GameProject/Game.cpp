@@ -12,15 +12,20 @@
 #include "SceneManager.h"
 #include "SoundServiceLocator.h"
 #include "SDLSoundSystem.h"
-#include "PerlinNoise2D.h"
+#include "GenerateWorldPerlinNoiseComponent.h"
+#include "ChunkComponent.h"
 
 void load()
 {
 	//create a scene
-	//auto scene = dae::SceneManager::GetInstance().CreateScene("scene", true);
+	auto scene = dae::SceneManager::GetInstance().CreateScene("scene", true);
 
 	//register the sdl soundSystem
 	//dae::ServiceLocator::registerSoundSystem<dae::SDLSoundSystem>();
+
+	auto go{ std::make_shared<dae::GameObject>(scene) };
+	go->AddComponent(std::make_unique<GenerateWorldPerlinNoiseComponent>(go.get(), 1024, scene));
+	scene->Add(go);
 }
 
 int main(int, char* []) {

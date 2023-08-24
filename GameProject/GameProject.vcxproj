@@ -79,19 +79,27 @@
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\GameProject\</IntDir>
     <IncludePath>$(SolutionDir)3rdParty\PerlinNoise\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\GameProject\</IntDir>
     <IncludePath>$(SolutionDir)3rdParty\PerlinNoise\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(Platform)\$(Configuration)\GameProject\</IntDir>
     <IncludePath>$(SolutionDir)3rdParty\PerlinNoise\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(Platform)\$(Configuration)\GameProject\</IntDir>
     <IncludePath>$(SolutionDir)3rdParty\PerlinNoise\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -198,7 +206,13 @@ xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(Output
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChunkComponent.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GenerateWorldPerlinNoiseComponent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChunkComponent.h" />
+    <ClInclude Include="GenerateWorldPerlinNoiseComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
