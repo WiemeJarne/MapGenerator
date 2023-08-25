@@ -9,7 +9,7 @@ class GenerateWorldPerlinNoiseComponent final : public dae::Component
 {
 public:
 	//the worldSize should be a power of 2 and bigger than or equal to 16x16
-	GenerateWorldPerlinNoiseComponent(dae::GameObject* pOwner, int worldSize, dae::Scene* pScene);
+	GenerateWorldPerlinNoiseComponent(dae::GameObject* pOwner, int worldXSize, int worldYSize, dae::Scene* pScene);
 
 	virtual void Update() override {}
 	virtual void Render() const override {}
@@ -18,6 +18,5 @@ public:
 	SDL_Color CalculateCellColor(int x, int y);
 
 private:
-	int m_WorldSize{};
 	std::unique_ptr<PerlinNoise2D> m_Perlin2D{};
 };

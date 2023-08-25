@@ -26,7 +26,7 @@ void load()
 	//dae::ServiceLocator::registerSoundSystem<dae::SDLSoundSystem>();
 
 	auto go{ std::make_shared<dae::GameObject>(scene) };
-	go->AddComponent(std::make_unique<GenerateWorldPerlinNoiseComponent>(go.get(), 512, scene));
+	go->AddComponent(std::make_unique<GenerateWorldPerlinNoiseComponent>(go.get(), 1280, 640, scene));
 	scene->Add(go);
 	
 	scene->Add(std::make_unique<dae::Camera>(1.f));
