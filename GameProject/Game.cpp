@@ -13,7 +13,9 @@
 #include "SoundServiceLocator.h"
 #include "SDLSoundSystem.h"
 #include "GenerateWorldPerlinNoiseComponent.h"
-#include "ChunkComponent.h"
+#include "Camera.h"
+#include "MoveCameraCommand.h"
+#include "glm/vec2.hpp"
 
 void load()
 {
@@ -24,8 +26,15 @@ void load()
 	//dae::ServiceLocator::registerSoundSystem<dae::SDLSoundSystem>();
 
 	auto go{ std::make_shared<dae::GameObject>(scene) };
-	go->AddComponent(std::make_unique<GenerateWorldPerlinNoiseComponent>(go.get(), 1024, scene));
+	go->AddComponent(std::make_unique<GenerateWorldPerlinNoiseComponent>(go.get(), 512, scene));
 	scene->Add(go);
+	
+	scene->Add(std::make_unique<dae::Camera>(1.f));
+
+	scene->AddKeyboardCommand(std::make_unique<dae::MoveCameraCommand>(glm::vec2{ 1.f, 0.f }, 10.f), dae::KeyState::pressed, dae::InputManager::KeyboardKey::A);
+	scene->AddKeyboardCommand(std::make_unique<dae::MoveCameraCommand>(glm::vec2{ -1.f, 0.f }, 10.f), dae::KeyState::pressed, dae::InputManager::KeyboardKey::D);
+	scene->AddKeyboardCommand(std::make_unique<dae::MoveCameraCommand>(glm::vec2{ 0.f, 1.f }, 10.f), dae::KeyState::pressed, dae::InputManager::KeyboardKey::W);
+	scene->AddKeyboardCommand(std::make_unique<dae::MoveCameraCommand>(glm::vec2{ 0.f, -1.f }, 10.f), dae::KeyState::pressed, dae::InputManager::KeyboardKey::S);
 }
 
 int main(int, char* []) {

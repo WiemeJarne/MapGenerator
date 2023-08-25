@@ -36,15 +36,9 @@
     <ClCompile Include="GenerateWorldPerlinNoiseComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="ChunkComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GenerateWorldPerlinNoiseComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="ChunkComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

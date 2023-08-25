@@ -122,8 +122,11 @@
 xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
-xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(OutputPath)" /R /Y</Command>
+</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\$(ConfigurationName)\*.lib" "$(OutputPath)" /R /Y</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -150,8 +153,11 @@ xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(Output
 xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
-xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(OutputPath)" /R /Y</Command>
+</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\$(ConfigurationName)\*.lib" "$(OutputPath)" /R /Y</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -174,8 +180,11 @@ xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(Output
 xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
-xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(OutputPath)" /R /Y</Command>
+</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\$(ConfigurationName)\*.lib" "$(OutputPath)" /R /Y</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -202,16 +211,17 @@ xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(Output
 xcopy "$(SolutionDir)3rdParty\SDL2_image\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_ttf\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
 xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputPath)" /R /Y
-xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\*.lib" "$(OutputPath)" /R /Y</Command>
+</Command>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>xcopy "$(SolutionDir)3rdParty\PerlinNoise\lib\$(PlatformTarget)\$(ConfigurationName)\*.lib" "$(OutputPath)" /R /Y</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChunkComponent.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GenerateWorldPerlinNoiseComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChunkComponent.h" />
     <ClInclude Include="GenerateWorldPerlinNoiseComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
