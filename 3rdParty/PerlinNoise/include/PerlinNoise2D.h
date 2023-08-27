@@ -12,7 +12,8 @@ public:
 	PerlinNoise2D(unsigned int seed = 1, int permutationTableSize = 256);
 
 	double GetNoise(double x, double y) const;
-	double GetNoise(double x, double y, int amountOfOctaves, double persistence);
+	double GetNoise(double x, double y, int amountOfOctaves, double persistence) const;
+	void SetSeed(int seed);
 
 private:
 	std::vector<int> m_PermutationTable{}; 
@@ -23,6 +24,4 @@ private:
 	int GetHashValue(int x, int y) const;
 	int Increment(int value, int maxValue) const;
 	double Gradient(int hash, double x, double y) const;
-
-	static int temp[256];
 };
