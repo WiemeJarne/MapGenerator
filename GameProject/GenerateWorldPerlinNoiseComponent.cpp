@@ -146,7 +146,7 @@ void GenerateWorldPerlinNoiseComponent::SafeWorldAsJPG()
 		else foundFileName = true;
 	}
 
-
+	//convert std::wstring to std::string
 	int utf8Length = WideCharToMultiByte(CP_UTF8, 0, documentFolderPath.c_str(), -1, nullptr, 0, nullptr, nullptr);
 	auto converted = std::string(utf8Length, '\0');
 	WideCharToMultiByte(CP_UTF8, 0, documentFolderPath.c_str(), -1, &converted[0], utf8Length, nullptr, nullptr);
@@ -155,7 +155,7 @@ void GenerateWorldPerlinNoiseComponent::SafeWorldAsJPG()
 	auto pSurface{ SDL_CreateRGBSurfaceWithFormatFrom(m_Pixels.data(), m_WorldXSize, m_WorldYSize, 32, biggestSide * sizeof(uint32_t), SDL_PIXELFORMAT_RGBA8888)};
 	if (pSurface)
 	{
-		if (IMG_SaveJPG(pSurface, converted.c_str(), 75) == 0)
+		if (IMG_SaveJPG(pSurface, converted.c_str(), 100) == 0)
 			std::cout << "world saved! at " + converted + '\n';
 		else
 			std::cout << IMG_GetError() << '\n';
