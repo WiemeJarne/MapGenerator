@@ -17,8 +17,8 @@ public:
 	virtual void Render() const override {}
 	virtual void RenderImGui() override;
 
-	SDL_Color CalculateCellColor(int x, int y);
-	void SafeWorldAsJPG();
+	
+	
 
 private:
 	int m_PreviousWorldXSize{};
@@ -27,6 +27,8 @@ private:
 	int m_WorldYSize{};
 	int m_PreviousPerlinNoiseSeed{};
 	int m_PerlinNoiseSeed{};
+	int m_PerlinNoiseAmountOfOctaves{ 4 };
+	float m_PerlinNoisePersistence{ 0.55f };
 	std::vector<uint32_t> m_Pixels{};
 	std::unique_ptr<PerlinNoise2D> m_Perlin2D{};
 	dae::TextureComponent* m_pTextureComponent{};
@@ -35,4 +37,7 @@ private:
 	std::wstring m_JPGSaveFolderPath{};
 
 	void Regenerate();
+	void DrawImGuiLine(float width, float spaceBelowPreviousItem = 2.f) const;
+	SDL_Color CalculateCellColor(int x, int y) const;
+	void SafeWorldAsJPG();
 };

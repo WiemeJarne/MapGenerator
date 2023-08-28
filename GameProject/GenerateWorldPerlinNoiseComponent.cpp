@@ -59,38 +59,63 @@ void GenerateWorldPerlinNoiseComponent::RenderImGui()
 	int width{}, height{};
 	SDL_GetRendererOutputSize(pRenderer, &width, &height);
 
-	const int menuWidth{ 150 };
-	const int borderSize{ 0 };;
-	bool windowActive = true;
+	const float menuWidth{ 200 };
 	
-	ImGui::SetNextWindowPos(ImVec2((float)width - menuWidth - borderSize, borderSize));
-	ImGui::SetNextWindowSize(ImVec2((float)menuWidth, (float)height - borderSize * 2));
-	ImGui::Begin("Settings", &windowActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+	ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) - menuWidth, 0.f));
+	ImGui::SetNextWindowSize(ImVec2(static_cast<float>(menuWidth), static_cast<float>(height)));
+	ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
 	
 	if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 	{
 		if (ImGui::BeginTabItem("World Generation"))
 		{
-			ImGui::PushItemWidth(135.f);
+			const float itemWidth{ menuWidth - 15.f };
+
+			ImGui::PushItemWidth(itemWidth);
+
+			if (ImGui::Button("regenerate", ImVec2(itemWidth, 25)))
+				m_ShouldRegenerate = true;
+
+			if (ImGui::Button("safe as jpg", ImVec2(itemWidth, 25)))
+				m_ShouldSaveTextureAsJPG = true;
+
+			ImGui::Text("Perlin noise");
+
+			DrawImGuiLine(menuWidth);
+
+			ImGui::Spacing();
 
 			ImGui::Text("seed:");
 			ImGui::InputInt("1", &m_PerlinNoiseSeed);
 
 			ImGui::Spacing();
 
-			ImGui::TextWrapped("world width(X) and height(Y) in pixels:");
-			ImGui::InputInt("2", &m_WorldXSize);
-			ImGui::InputInt("3", &m_WorldYSize);
-
-			ImGui::PopItemWidth();
+			ImGui::TextWrapped("amount of octaves (higher = more detail):");
+			ImGui::SliderInt("2", &m_PerlinNoiseAmountOfOctaves, 1, 30);
 
 			ImGui::Spacing();
 
-			if (ImGui::Button("regenerate", ImVec2(135, 25)))
-				m_ShouldRegenerate = true;
+			ImGui::TextWrapped("persistence (detail strenght):");
+			ImGui::SliderFloat("3", &m_PerlinNoisePersistence, 0.f, 1.f);
 
-			if (ImGui::Button("safe as jpg", ImVec2(135, 25)))
-				m_ShouldSaveTextureAsJPG = true;
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			ImGui::Text("World");
+
+			DrawImGuiLine(menuWidth);
+
+			ImGui::Spacing();
+
+			ImGui::TextWrapped("world width(X) in pixels:");
+			ImGui::InputInt("4", &m_WorldXSize);
+
+			ImGui::Spacing();
+
+			ImGui::TextWrapped("world height(Y) in pixels:");
+			ImGui::InputInt("5", &m_WorldYSize);
+
+			ImGui::PopItemWidth();			
 
 			ImGui::EndTabItem();
 		}
@@ -105,12 +130,20 @@ void GenerateWorldPerlinNoiseComponent::RenderImGui()
 	ImGui::End();
 }
 
-SDL_Color GenerateWorldPerlinNoiseComponent::CalculateCellColor(int x, int y)
+void GenerateWorldPerlinNoiseComponent::DrawImGuiLine(float width, float spaceBelowPreviousItem) const
+{
+	ImVec2 min{ ImGui::GetItemRectMin() };
+	ImVec2 max{ min.x + width, ImGui::GetItemRectMax().y };
+	max.y += spaceBelowPreviousItem;
+	min.y = max.y;
+	ImGui::GetWindowDrawList()->AddLine(min, max, ImColor(1.f, 1.f, 1.f), 1.f);
+}
+
+SDL_Color GenerateWorldPerlinNoiseComponent::CalculateCellColor(int x, int y) const
 {
 	constexpr float devider{ 128 };
 	
-	double noise{ (m_Perlin2D->GetNoise(x / devider, y / devider, 4, 0.55f) + 1) / 2.f };
-	//return SDL_Color{ static_cast<Uint8>(noise * 255), static_cast<Uint8>(noise * 255), static_cast<Uint8>(noise * 255) };
+	double noise{ (m_Perlin2D->GetNoise(x / devider, y / devider, m_PerlinNoiseAmountOfOctaves, m_PerlinNoisePersistence) + 1) / 2.f };
 	if (noise < 0.475f)
 		return SDL_Color(0, 255u, 0);
 	else
