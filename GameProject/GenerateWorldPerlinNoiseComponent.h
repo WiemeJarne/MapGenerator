@@ -16,10 +16,7 @@ public:
 	virtual void Update() override;
 	virtual void Render() const override {}
 	virtual void RenderImGui() override;
-
 	
-	
-
 private:
 	int m_PreviousWorldXSize{};
 	int m_WorldXSize{};
@@ -34,10 +31,17 @@ private:
 	dae::TextureComponent* m_pTextureComponent{};
 	bool m_ShouldRegenerate{};
 	bool m_ShouldSaveTextureAsJPG{};
+	bool m_ShouldCreateNewCellKind{};
 	std::wstring m_JPGSaveFolderPath{};
+	std::vector<std::vector<float>> m_CellKindColors{};
+	std::vector<std::pair<float, float>> m_CellKindValueRange{}; //first float = min value, second float = max value
+	std::vector<int> m_CellKindIndicesToRemove{};
 
 	void Regenerate();
-	void DrawImGuiLine(float width, float spaceBelowPreviousItem = 2.f) const;
-	SDL_Color CalculateCellColor(int x, int y) const;
 	void SafeWorldAsJPG();
+	SDL_Color CalculateCellColor(int x, int y) const;
+	SDL_Color FloatVectorToSDLColor(const std::vector<float>& values) const;
+	void CreateNewCellKind();
+	void CellKindDragDropSource(int index);
+	void CellKindDragDropTarget(int index);
 };

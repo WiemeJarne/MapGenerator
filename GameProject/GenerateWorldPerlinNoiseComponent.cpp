@@ -36,6 +36,12 @@ GenerateWorldPerlinNoiseComponent::GenerateWorldPerlinNoiseComponent(dae::GameOb
 	std::filesystem::create_directory(documentFolderPath);
 
 	m_JPGSaveFolderPath = documentFolderPath;
+
+	m_CellKindColors.push_back(std::vector<float>{ 0.f, 1.f, 0.f });
+	m_CellKindColors.push_back(std::vector<float>{ 0.f, 0.f, 1.f });
+
+	m_CellKindValueRange.push_back({ 0.f, 0.475f });
+	m_CellKindValueRange.push_back({ 0.475f, 1.f });
 }
 
 void GenerateWorldPerlinNoiseComponent::Update()
@@ -51,6 +57,23 @@ void GenerateWorldPerlinNoiseComponent::Update()
 		SafeWorldAsJPG();
 		m_ShouldSaveTextureAsJPG = false;
 	}
+
+	if (m_ShouldCreateNewCellKind)
+	{
+		CreateNewCellKind();
+		m_ShouldCreateNewCellKind = false;
+	}
+
+	for (auto& index : m_CellKindIndicesToRemove)
+	{
+		if (index < 0 || index > m_CellKindColors.size())
+			return;
+
+		m_CellKindColors.erase(std::remove(m_CellKindColors.begin(), m_CellKindColors.end(), m_CellKindColors[index]));
+		m_CellKindValueRange.erase(std::remove(m_CellKindValueRange.begin(), m_CellKindValueRange.end(), m_CellKindValueRange[index]));
+	}
+
+	m_CellKindIndicesToRemove.clear();
 }
 
 void GenerateWorldPerlinNoiseComponent::RenderImGui()
@@ -58,85 +81,200 @@ void GenerateWorldPerlinNoiseComponent::RenderImGui()
 	auto pRenderer{ dae::Renderer::GetInstance().GetSDLRenderer() };
 	int width{}, height{};
 	SDL_GetRendererOutputSize(pRenderer, &width, &height);
-
-	const float menuWidth{ 200 };
+	
+	float menuWidth{ 200 };
 	
 	ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) - menuWidth, 0.f));
 	ImGui::SetNextWindowSize(ImVec2(static_cast<float>(menuWidth), static_cast<float>(height)));
-	ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
-	
+	ImGui::Begin("Generation Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+
+	bool hasScrollbar{};
+
+	if (ImGui::GetScrollMaxY() > 0.f)
+		hasScrollbar = true;
+
 	if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 	{
-		if (ImGui::BeginTabItem("World Generation"))
+		float itemWidth{ menuWidth - 15.f };
+		if (hasScrollbar)
+			itemWidth -= ImGui::GetStyle().ScrollbarSize;
+		ImGui::PushItemWidth(itemWidth);
+
+		if (ImGui::BeginTabItem("World"))
 		{
-			const float itemWidth{ menuWidth - 15.f };
-
-			ImGui::PushItemWidth(itemWidth);
-
-			if (ImGui::Button("regenerate", ImVec2(itemWidth, 25)))
+			if (ImGui::Button("Regenerate", ImVec2(itemWidth, 25)))
 				m_ShouldRegenerate = true;
 
-			if (ImGui::Button("safe as jpg", ImVec2(itemWidth, 25)))
+			if (ImGui::Button("Safe as jpg", ImVec2(itemWidth, 25)))
 				m_ShouldSaveTextureAsJPG = true;
 
-			ImGui::Text("Perlin noise");
+			if (ImGui::CollapsingHeader("Perlin noise"))
+			{
+				ImGui::Text("Seed:");
+				ImGui::InputInt("1", &m_PerlinNoiseSeed);
 
-			DrawImGuiLine(menuWidth);
+				ImGui::Spacing();
 
-			ImGui::Spacing();
+				ImGui::TextWrapped("amount of octaves (higher = more detail):");
+				ImGui::SliderInt("2", &m_PerlinNoiseAmountOfOctaves, 1, 30);
 
-			ImGui::Text("seed:");
-			ImGui::InputInt("1", &m_PerlinNoiseSeed);
+				ImGui::Spacing();
 
-			ImGui::Spacing();
+				ImGui::TextWrapped("persistence (detail strenght):");
+				ImGui::SliderFloat("3", &m_PerlinNoisePersistence, 0.f, 1.f);
 
-			ImGui::TextWrapped("amount of octaves (higher = more detail):");
-			ImGui::SliderInt("2", &m_PerlinNoiseAmountOfOctaves, 1, 30);
+				ImGui::Spacing();
+			}
 
-			ImGui::Spacing();
+			if (ImGui::CollapsingHeader("World"))
+			{
+				ImGui::Indent(5.f);
 
-			ImGui::TextWrapped("persistence (detail strenght):");
-			ImGui::SliderFloat("3", &m_PerlinNoisePersistence, 0.f, 1.f);
+				if (hasScrollbar)
+					ImGui::PushItemWidth(menuWidth - 20.f - ImGui::GetStyle().ScrollbarSize);
+				else
+				ImGui::PushItemWidth(menuWidth - 20.f);
 
-			ImGui::Spacing();
-			ImGui::Spacing();
+				if (ImGui::CollapsingHeader("Size"))
+				{
+					ImGui::TextWrapped("World width(X) in pixels:");
+					ImGui::InputInt("4", &m_WorldXSize);
 
-			ImGui::Text("World");
+					ImGui::Spacing();
 
-			DrawImGuiLine(menuWidth);
+					ImGui::TextWrapped("World height(Y) in pixels:");
+					ImGui::InputInt("5", &m_WorldYSize);
 
-			ImGui::Spacing();
+					ImGui::Spacing();
+				}
+				
+				if (ImGui::CollapsingHeader("Cell kinds"))
+				{
+					ImGui::Indent(5.f);
+					
+					if (hasScrollbar)
+						ImGui::PushItemWidth(menuWidth - 25.f - ImGui::GetStyle().ScrollbarSize);
+					else
+						ImGui::PushItemWidth(menuWidth - 25.f);
 
-			ImGui::TextWrapped("world width(X) in pixels:");
-			ImGui::InputInt("4", &m_WorldXSize);
+					for (int index{}; index < m_CellKindColors.size(); ++index)
+					{
+						auto indexToString{ std::to_string(index) };
+						bool visibility{ true };
+						if (ImGui::CollapsingHeader((indexToString).c_str(), &visibility))
+						{
+							CellKindDragDropSource(index);
 
-			ImGui::Spacing();
+							CellKindDragDropTarget(index);
 
-			ImGui::TextWrapped("world height(Y) in pixels:");
-			ImGui::InputInt("5", &m_WorldYSize);
+							if (!visibility)
+							{
+								m_CellKindIndicesToRemove.push_back(index);
+							}
 
-			ImGui::PopItemWidth();			
+							ImGui::Text("color:");
+							ImGui::ColorEdit3(("color" + indexToString).c_str(), m_CellKindColors[index].data());
+							
+							ImGui::Text("minimum value:");
+							if (ImGui::SliderFloat(("min" + indexToString).c_str(), &m_CellKindValueRange[index].first, 0.f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+							{
+								if (index - 1 >= 0)
+								{
+									m_CellKindValueRange[index - 1].second = m_CellKindValueRange[index].first;
+								}
+
+								if (m_CellKindValueRange[index].first > m_CellKindValueRange[index].second)
+									m_CellKindValueRange[index].second = m_CellKindValueRange[index].first;
+							}
+
+							ImGui::Text("maximum value:");
+							if (ImGui::SliderFloat(("max" + indexToString).c_str(), &m_CellKindValueRange[index].second, 0.f, 1.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+							{
+								if (index + 1 < m_CellKindValueRange.size())
+								{
+									m_CellKindValueRange[index + 1].first = m_CellKindValueRange[index].second;
+								}
+
+								if (m_CellKindValueRange[index].second < m_CellKindValueRange[index].first)
+									m_CellKindValueRange[index].first = m_CellKindValueRange[index].second;
+							}
+
+							ImGui::Spacing();
+						}
+						else
+						{
+							CellKindDragDropSource(index);
+							
+							CellKindDragDropTarget(index);
+						}
+					}
+
+					if(ImGui::Button("add cell kind", ImVec2(itemWidth, 20)))
+					{
+						m_ShouldCreateNewCellKind = true;
+					}
+
+					ImGui::PopItemWidth();
+					ImGui::Unindent();
+				}
+				ImGui::PopItemWidth();
+				ImGui::Unindent();
+			}
 
 			ImGui::EndTabItem();
 		}
-		//if (ImGui::BeginTabItem("Details"))
+
+		//if (ImGui::BeginTabItem("Biome"))
 		//{
-		//	ImGui::Text("ID: 0123456789");
+		//
 		//	ImGui::EndTabItem();
 		//}
+		//
+		//if (ImGui::BeginTabItem("Cave"))
+		//{
+		//
+		//	ImGui::EndTabItem();
+		//}
+
+		ImGui::PopItemWidth();
 		ImGui::EndTabBar();
 	}
 
 	ImGui::End();
 }
 
-void GenerateWorldPerlinNoiseComponent::DrawImGuiLine(float width, float spaceBelowPreviousItem) const
+void GenerateWorldPerlinNoiseComponent::CellKindDragDropSource(int index)
 {
-	ImVec2 min{ ImGui::GetItemRectMin() };
-	ImVec2 max{ min.x + width, ImGui::GetItemRectMax().y };
-	max.y += spaceBelowPreviousItem;
-	min.y = max.y;
-	ImGui::GetWindowDrawList()->AddLine(min, max, ImColor(1.f, 1.f, 1.f), 1.f);
+	if (ImGui::BeginDragDropSource())
+	{
+		int* pData{ new int {index} };
+		ImGui::SetDragDropPayload("CellKind", pData, sizeof(int));
+		ImGui::Text("Drag and drop to swap color");
+		ImGui::EndDragDropSource();
+	}
+}
+
+void GenerateWorldPerlinNoiseComponent::CellKindDragDropTarget(int index)
+{
+	if (ImGui::BeginDragDropTarget())
+	{
+		auto pPayload{ ImGui::AcceptDragDropPayload("CellKind") };
+
+		if (pPayload)
+		{
+			int data{ *reinterpret_cast<int*>(pPayload->Data) };
+
+			if (data < 0 || data > m_CellKindColors.size())
+				return;
+
+			auto tempColor{ m_CellKindColors[data] };
+
+			m_CellKindColors[data] = m_CellKindColors[index];
+			m_CellKindColors[index] = tempColor;
+		}
+
+		ImGui::EndDragDropTarget();
+	}
 }
 
 SDL_Color GenerateWorldPerlinNoiseComponent::CalculateCellColor(int x, int y) const
@@ -144,10 +282,25 @@ SDL_Color GenerateWorldPerlinNoiseComponent::CalculateCellColor(int x, int y) co
 	constexpr float devider{ 128 };
 	
 	double noise{ (m_Perlin2D->GetNoise(x / devider, y / devider, m_PerlinNoiseAmountOfOctaves, m_PerlinNoisePersistence) + 1) / 2.f };
+
+	for (int index{}; index < m_CellKindValueRange.size(); ++index)
+	{
+		if (noise > m_CellKindValueRange[index].first && noise < m_CellKindValueRange[index].second)
+			return FloatVectorToSDLColor(m_CellKindColors[index]);
+	}
+
 	if (noise < 0.475f)
 		return SDL_Color(0, 255u, 0);
 	else
 		return SDL_Color(0, 0, 255u);
+}
+
+SDL_Color GenerateWorldPerlinNoiseComponent::FloatVectorToSDLColor(const std::vector<float>& values) const
+{
+	if (values.size() != 3)
+		return SDL_Color();
+
+	return SDL_Color(static_cast<Uint8>(values[0] * 255.f), static_cast<Uint8>(values[1] * 255.f), static_cast<Uint8>(values[2] * 255.f));
 }
 
 void GenerateWorldPerlinNoiseComponent::SafeWorldAsJPG()
@@ -247,4 +400,10 @@ void GenerateWorldPerlinNoiseComponent::Regenerate()
 		else
 			m_pTextureComponent->SetSDLTexture(pColorTexture);
 	}
+}
+
+void GenerateWorldPerlinNoiseComponent::CreateNewCellKind()
+{
+	m_CellKindColors.push_back(std::vector<float>{ 0.f, 0.f, 0.f });
+	m_CellKindValueRange.push_back({ m_CellKindValueRange[m_CellKindValueRange.size() - 1].second, 1.f });
 }
