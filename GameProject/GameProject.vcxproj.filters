@@ -36,10 +36,16 @@
     <ClCompile Include="GenerateWorldPerlinNoiseComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="WorleyNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GenerateWorldPerlinNoiseComponent.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="WorleyNoise.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

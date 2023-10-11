@@ -220,9 +220,11 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GenerateWorldPerlinNoiseComponent.cpp" />
+    <ClCompile Include="WorleyNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GenerateWorldPerlinNoiseComponent.h" />
+    <ClInclude Include="WorleyNoise.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
